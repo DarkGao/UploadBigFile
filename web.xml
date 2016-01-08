@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>SpringExtFrm</display-name>
+    <!-- log4j 配置  开始 -->
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/classes/com/dark/properties/log4j.properties</param-value>
+    </context-param>
+    <context-param>
+        <param-name>log4jRefreshInterval</param-name>
+        <param-value>600000</param-value>
+    </context-param>
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>fes.root</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+    <!-- log4j 配置  结束 -->
+
+    <!-- 设置servlet编码开始 -->
+    <!-- 建立字符集过滤器，强制将输入转化为utf-8类型 -->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <!-- 过滤范围 -->
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- 设置servlet编码结束 -->
+    
+    <!-- 设置BackURL开始 -->
+    <!-- BackURL也是全局过滤器,主要记录用户上一次访问的路径并向当前请求类传递 -->    
+    <!--<filter>
+        <filter-name>BackUrlFilter</filter-name>
+        <filter-class>com.dark.filter.BackUrl</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>BackUrlFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>-->
+    <!-- 设置BackURL结束 -->
+    
+    <!-- MultiForm 用来获得二进制流混排上传 --> 
+    <filter>
+        <filter-name>MultiForm</filter-name>
+        <filter-class>com.dark.filter.MultiForm</filter-class>
+		<init-param>  
+			<param-name>fileSavePath</param-name>  
+			<param-value>uploadFile</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>maxPkgBytes</param-name>  
+			<param-value>1024</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>recvExtList</param-name>  
+			<param-value>/*</param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>rejectExtList</param-name>  
+			<param-value></param-value>  
+		</init-param>
+		<init-param>  
+			<param-name>useOriFileName</param-name>  
+			<param-value>true</param-value>  
+		</init-param>	
+		<init-param>  
+			<param-name>autoDelProg</param-name>  
+			<param-value>true</param-value>  
+		</init-param>					
+    </filter>
+    <filter-mapping>
+        <filter-name>MultiForm</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- End MultiForm -->
+       
+    
+    <!-- Spring配置文件开始  -->    
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:com/dark/config/spring-base.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener> -->
+    <!-- Spring配置文件结束 -->
+        
+    <!-- 配置Hibernate的session连接时间与用户请求Spring的处理时间一致 -->    
+    <filter>
+        <filter-name>openSessionInVieFilter</filter-name>
+        <filter-class>org.springframework.orm.hibernate4.support.OpenSessionInViewFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>openSessionInVieFilter</filter-name>
+        <servlet-name>spring</servlet-name>
+    </filter-mapping>
+
+    <!-- 浏览器不支持put,delete等method,由该filter将/blog?_method=delete转换为标准的http delete方法 -->
+    <filter>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <servlet-name>spring</servlet-name>
+    </filter-mapping>
+
+	<!-- 挂接Spring为主servlet处理器 -->
+	<!-- 加载Spring MVC配置文件spring-dispather.xml -->
+    <servlet>
+        <servlet-name>spring-dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+           <init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath*:com/dark/config/spring-dispather.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>spring-dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <!-- Spring MVC配置完毕 -->
+    
+    <!-- 错误页面跳转 -->
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp?code=500</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error.jsp?code=404</location>
+	</error-page>
+	<error-page>
+		<error-code>405</error-code>
+		<location>/error.jsp?code=405</location>
+	</error-page>
+	<error-page>
+		<error-code>406</error-code>
+		<location>/error.jsp?code=406</location>
+	</error-page>
+	<error-page>
+		<error-code>415</error-code>
+		<location>/error.jsp?code=415</location>
+	</error-page>
+	<error-page>
+		<error-code>400</error-code>
+		<location>/error.jsp?code=400</location>
+	</error-page>
+
+	<!-- 根目录首页 -->
+	<!-- 这里配置的/index将映射到SimpleConlloerBean -->
+    <welcome-file-list>
+        <welcome-file>multi-form.jsp</welcome-file>
+        <welcome-file>/index</welcome-file>
+    </welcome-file-list>
+</web-app>
